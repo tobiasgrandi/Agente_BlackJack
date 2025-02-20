@@ -26,6 +26,8 @@ class BlackJack():
     def __init__(self):
         self.deck = [1,2,3,4,5,6,7,8,9,10,10,10]*4
         np.random.shuffle(self.deck) #Mezclar cartas
+        self.done = False #Estado del juego
+        self.player_state = '' #Estado del jugador (Under 21, Over 21, Lose, Win)
 
     def reset(self): #Comenzar un nuevo juego
         self.player = Player()
@@ -42,18 +44,26 @@ class BlackJack():
 
     def get_state(self):
         return {'sum_player': self.player.sum,
-                'dealer': self.dealer.card,
+                'player_state': self.player_state,
+                'dealer': self.dealer.cards[0],
                 'has_ace': 1 if self.player.has_ace else 0}
 
     def step(self, action): #Pasar de un estado a otro, según acción del jugador
 
-        if action == 0: #El jugador pide
+        if action == 0: #El jugador pide VER QUE PASA CON EL AS
             self.deal_card()
             if self.player.sum > 21:
                 self.done = True
-                return 'Over 21'
-            
+                self.player_state = 'Over 21'
+            else:
+                self.player_state = 'Under 21'
         else:
             while self.dealer.sum <= 16:
                 self.take_card()
+            self.done = True
+
+            if self.dealer.sum >= self.player.state:
+                self.player_state = 'Lose'
+            else:
+                self.player_state = 'Win'
             
