@@ -1,7 +1,19 @@
 from blackjack import BlackJack, Player
 from q_learning import Qlearning
+from plot import Plotter
 
 env = BlackJack()
-qlearning = Qlearning(alpha=0.5, gamma=0.7, epsilon=0.8)
+qlearning = Qlearning(alpha=0.1, gamma=0.95, epsilon=1)
 
-qlearning.train(env)
+episodes = 10000000
+qlearning.train(env, num_episodes= episodes)
+
+plot = Plotter(qlearning)
+#plot.plot_rewards()
+#plot.plot_var()
+#plot.plot_wins()
+plot.plot_tables(0)
+plot.plot_tables(1)
+
+
+print(qlearning.results)
