@@ -9,9 +9,9 @@ class Qlearning():
         self.alpha = alpha #Tasa de aprendizaje
         self.gamma = gamma #Tasa de descuento
         self.epsilon = epsilon #Tasa de exploración
-        self.reward = {"Lose": -15,
-                        "Win": 15,
-                        'Over 21': -20}
+        self.reward = {"Lose": -1,
+                        "Win": 1,
+                        'Over 21': -1}
         self.results = {
             'Lose': 0,
             'Win': 0,
@@ -35,45 +35,11 @@ class Qlearning():
         self.qtable[current_state['sum_player']-4, current_state['dealer']-2, current_state['has_ace'], action] = current_q + self.alpha*(reward+self.gamma*max_next_q-current_q)
 
 
-    def reduce_exploration(self, episode):
-        self.epsilon = max(0.1, self.epsilon*0.8)
+    def reduce_exploration(self):
+        self.epsilon = max(0.1, self.epsilon*0.7)
 
-    def get_reward(self, player_state, action, has_ace):
-        
-        if player_state == 'Exactly 21':
-            if action == 0:
-                return -25
-            else:
-                return 20
-        elif player_state == 'Btw 17-21': #Acción con suma entre 17 y 21
-            if has_ace == 0: #No se tiene As
-                if action == 0: 
-                    return -5
-                else:
-                    return 5
-            else:
-                if action == 0:
-                    return 2
-                else:
-                    return -2
-        elif player_state == 'Btw 11-17': #Acción con suma entre 11 y 17
-            if has_ace == 0:
-                if action == 0: 
-                    return 5
-                else:
-                    return 2
-            else:
-                if action == 0:
-                    return 2
-                else:
-                    return 5
-        elif player_state == 'Under 11': #Penalizar si tiene menos de 11 y se queda
-            if action == 0: 
-                return 10
-            else:
-                return -10
-        else:
-            return self.reward[player_state]
+    def get_reward(self, player_state):
+        return self.reward[player_state]
 
 
     def train(self, env, num_episodes=10000000):
@@ -83,6 +49,7 @@ class Qlearning():
 
             done = False
             episode_reward = 0
+            episode_history = []
             while not done:
                 state = env.get_state()
                 player_action = self.select_action(state)
@@ -92,22 +59,25 @@ class Qlearning():
                 if next_state['player_state'] == 'Over 21':
                     next_state['sum_player'] = state['sum_player'] #Si se pasó, penalizar la última suma antes de que se pase
                 
-                reward = self.get_reward(state['player_state'], player_action, state['has_ace'])
-                self.update_qtable(state, next_state, player_action, reward)
-                episode_reward += reward
+                episode_history.append((state, player_action, next_state))
 
                 done = env.done
 
-            self.reduce_exploration(episode+1)
+            self.reduce_exploration()
+
+            for state, player_action, next_state in episode_history:
+                result = env.player_state
+                reward = self.get_reward(result)
+                self.update_qtable(state, next_state, player_action, reward)
+                self.rewards_history.append(reward)
 
             if next_state['player_state'] == 'Win':
                 self.wins_history.append(1)
             else:
                 self.wins_history.append(0)
 
-            self.rewards_history.append(episode_reward)
 
             self.results[next_state['player_state']] += 1
 
-            if episode % 10000 == 0:
+            if episode % 100000 == 0:
                 print(episode)

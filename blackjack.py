@@ -27,7 +27,7 @@ class Dealer():
 class BlackJack():
     def __init__(self):
         self.done = False #Estado del juego
-        self.player_state = 'Under 11' #Estado del jugador (Under 21, Over 21, Lose, Win)
+        self.player_state = 'Playing' #Estado del jugador (Under 21, Over 21, Lose, Win)
 
     def reset(self): #Comenzar un nuevo juego
         self.deck = [1,2,3,4,5,6,7,8,9,10,10,10]*4
@@ -55,14 +55,14 @@ class BlackJack():
     def calculate_mid_player_state(self): #Calcular estado del jugador si no se plantó
         if self.player.sum > 21:
             self.player_state = 'Over 21'
-        elif self.player.sum == 21:
-            self.player_state == 'Exactly 21'
-        elif 17 <= self.player.sum < 21:
-            self.player_state = 'Btw 17-21'
-        elif 11 < self.player.sum <= 16:
-            self.player_state = 'Btw 11-17'
-        else:
-            self.player_state = 'Under 11'
+        #elif self.player.sum == 21:
+        #    self.player_state == 'Exactly 21'
+        #elif 17 <= self.player.sum < 21:
+        #    self.player_state = 'Btw 17-21'
+        #elif 11 < self.player.sum <= 16:
+        #    self.player_state = 'Btw 11-17'
+        #else:
+        #    self.player_state = 'Under 11'
 
     def calculate_last_player_state(self): #Calcular estado del jugador una vez se plantó
         if self.dealer.sum > 21:

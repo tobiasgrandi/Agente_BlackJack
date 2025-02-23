@@ -1,21 +1,22 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import numpy as np
+import pandas as pd
 
 class Plotter():
 
     def __init__(self, qlearning):
         self.qlearning = qlearning
 
-    def moving_average(data, window_size=1000):
-        return np.convolve(data, np.ones(window_size)/window_size, mode='valid')    
     
     def plot_rewards(self):
-        window = 500
-        avg_rewards = [np.mean(self.qlearning.rewards_history[i-window:i]) for i in range(window, len(self.qlearning.rewards_history))]
-        
+        window = 1000
+        # Recompensas promedio con media movil de tamaño window
+        avg_rewards = pd.Series(self.qlearning.rewards_history).rolling(window).mean()
+
+        # Gráfico
         plt.figure(figsize=(10,5))
-        plt.plot(range(window, len(self.qlearning.rewards_history)), avg_rewards, label="Recompensa Promedio")
+        plt.plot(np.arange(len(avg_rewards)), avg_rewards, label="Recompensa Promedio")
         plt.xlabel("Episodios")
         plt.ylabel("Recompensa Promedio")
         plt.title("Evolución de la Recompensa Durante el Entrenamiento")
@@ -23,10 +24,11 @@ class Plotter():
         plt.show()
 
     def plot_var(self):
-        window_size = 1000
-        var_rewards = [np.var(self.qlearning.rewards_history[i:i+window_size]) for i in range(0, len(self.qlearning.rewards_history)-window_size, window_size)]
+        window = 1000
+        var_rewards = pd.Series(self.qlearning.rewards_history).rolling(window).var()
+
         plt.figure(figsize=(10, 5))
-        plt.plot(var_rewards, label='Varianza de la Recompensa', color='red')
+        plt.plot(np.arange(len(var_rewards)), var_rewards, label='Varianza de la Recompensa', color='red')
         plt.xlabel('Bloques de episodios')
         plt.ylabel('Varianza')
         plt.title('Evolución de la Varianza de la Recompensa')
@@ -36,10 +38,10 @@ class Plotter():
     def plot_wins(self):
         window = 100000
 
-        avg_wins = [np.mean(self.qlearning.wins_history[i-window:i]) for i in range(window, len(self.qlearning.wins_history))]
+        avg_wins = pd.Series(self.qlearning.wins_history).rolling(window).mean()
 
         plt.figure(figsize=(10,5))
-        plt.plot(range(window, len(self.qlearning.wins_history)), avg_wins, label="Victorias Promedio")
+        plt.plot(np.arange(len(avg_wins)), avg_wins, label="Victorias Promedio")
         plt.xlabel("Episodios")
         plt.ylabel("Victorias Promedio")
         plt.title("Evolución de las Victorias Durante el Entrenamiento")
