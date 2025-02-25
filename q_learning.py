@@ -9,13 +9,11 @@ class Qlearning():
         self.alpha = alpha #Tasa de aprendizaje
         self.gamma = gamma #Tasa de descuento
         self.epsilon = epsilon #Tasa de exploración
-        self.reward = {"Lose": -1,
-                        "Win": 1,
-                        'Over 21': -1}
+        self.reward = {"Lose": -10,
+                        "Win": 10}
         self.results = {
             'Lose': 0,
             'Win': 0,
-            'Over 21': 0,
         }
         self.rewards_history = []
         self.wins_history = []
@@ -24,22 +22,28 @@ class Qlearning():
     def select_action(self, state): #Devuelve la acción a tomar por el jugador
         if np.random.rand() < self.epsilon: #Exploración
             return np.random.choice([0,1])
-        return np.argmax(self.qtable[state['sum_player']-4, state['dealer']-2, state['has_ace']]) #Explotación
+        return np.argmax(self.qtable[state['player_total']-4, state['dealer']-2, state['has_ace']]) #Explotación
     
     
     def update_qtable(self, current_state, next_state, action, reward):
-        current_q = self.qtable[current_state['sum_player']-4, current_state['dealer']-2, current_state['has_ace'], action]
-        max_next_q = np.max(self.qtable[next_state['sum_player']-4, next_state['dealer']-2, next_state['has_ace']])
+        current_q = self.qtable[current_state['player_total']-4, current_state['dealer']-2, current_state['has_ace'], action]
+        max_next_q = np.max(self.qtable[next_state['player_total']-4, next_state['dealer']-2, next_state['has_ace']])
         
         
-        self.qtable[current_state['sum_player']-4, current_state['dealer']-2, current_state['has_ace'], action] = current_q + self.alpha*(reward+self.gamma*max_next_q-current_q)
+        self.qtable[current_state['player_total']-4, current_state['dealer']-2, current_state['has_ace'], action] = current_q + self.alpha*(reward+self.gamma*max_next_q-current_q)
 
 
     def reduce_exploration(self):
-        self.epsilon = max(0.1, self.epsilon*0.7)
+        self.epsilon = max(0.1, self.epsilon*0.95)
 
-    def get_reward(self, player_state):
-        return self.reward[player_state]
+    def get_reward(self, player_state, player_total):
+        diff = 21 - player_total
+        reward = 0
+        if diff >= 0:
+            reward += (-(diff**2)/10)+10 #Si diff >= 6, es negativo
+        else:
+            reward += (-(diff**2)-3) #Siempre es negativo
+        return reward + self.reward[player_state]
 
 
     def train(self, env, num_episodes=10000000):
@@ -48,7 +52,6 @@ class Qlearning():
             env.reset()
 
             done = False
-            episode_reward = 0
             episode_history = []
             while not done:
                 state = env.get_state()
@@ -56,18 +59,17 @@ class Qlearning():
                 env.step(player_action)
                 next_state = env.get_state()
 
-                if next_state['player_state'] == 'Over 21':
-                    next_state['sum_player'] = state['sum_player'] #Si se pasó, penalizar la última suma antes de que se pase
+                if next_state['player_state'] == 'Lose' and next_state['player_total'] > 21:
+                    next_state['player_total'] = state['player_total'] #Si se pasó, penalizar la última suma antes de que se pase
                 
                 episode_history.append((state, player_action, next_state))
 
                 done = env.done
 
-            self.reduce_exploration()
 
             for state, player_action, next_state in episode_history:
-                result = env.player_state
-                reward = self.get_reward(result)
+                player_state = episode_history[-1][2]['player_state'] #El estado final del episodio es el resultado del último estado
+                reward = self.get_reward(player_state, env.player.total)
                 self.update_qtable(state, next_state, player_action, reward)
                 self.rewards_history.append(reward)
 
@@ -79,5 +81,7 @@ class Qlearning():
 
             self.results[next_state['player_state']] += 1
 
-            if episode % 100000 == 0:
-                print(episode)
+            if episode % 100000 == 0 and episode != 0:
+                self.reduce_exploration()
+                print(episode, self.epsilon)
+                

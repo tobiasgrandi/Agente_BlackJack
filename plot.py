@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
+import math
 import numpy as np
 import pandas as pd
 
@@ -7,38 +8,39 @@ class Plotter():
 
     def __init__(self, qlearning):
         self.qlearning = qlearning
+        self.window = 100000
 
-    
-    def plot_rewards(self):
-        window = 1000
-        # Recompensas promedio con media movil de tamaño window
-        avg_rewards = pd.Series(self.qlearning.rewards_history).rolling(window).mean()
 
-        # Gráfico
-        plt.figure(figsize=(10,5))
-        plt.plot(np.arange(len(avg_rewards)), avg_rewards, label="Recompensa Promedio")
-        plt.xlabel("Episodios")
-        plt.ylabel("Recompensa Promedio")
-        plt.title("Evolución de la Recompensa Durante el Entrenamiento")
-        plt.legend()
-        plt.show()
+    def plot_rewards_var(self):
+        rewards_history = pd.Series(self.qlearning.rewards_history)
 
-    def plot_var(self):
-        window = 1000
-        var_rewards = pd.Series(self.qlearning.rewards_history).rolling(window).var()
+        avg_rewards = rewards_history.rolling(self.window).mean()
+        var_rewards = rewards_history.rolling(self.window).var()
 
-        plt.figure(figsize=(10, 5))
-        plt.plot(np.arange(len(var_rewards)), var_rewards, label='Varianza de la Recompensa', color='red')
-        plt.xlabel('Bloques de episodios')
-        plt.ylabel('Varianza')
-        plt.title('Evolución de la Varianza de la Recompensa')
-        plt.legend()
+        fig, ax1 = plt.subplots(figsize=(10, 5))
+
+        # Eje Y de la recompensa promedio (azul)
+        ax1.set_xlabel("Episodios")
+        ax1.set_ylabel("Recompensa Promedio", color="blue")
+        line1, = ax1.plot(np.arange(len(avg_rewards)), avg_rewards, label="Recompensa Promedio", color="blue")
+        ax1.tick_params(axis="y", labelcolor="blue")
+
+        # Eje Y de la varianza (rojo)
+        ax2 = ax1.twinx()
+        ax2.set_ylabel("Varianza de la Recompensa", color="red")
+        line2, = ax2.plot(np.arange(len(var_rewards)), var_rewards, label="Varianza de la Recompensa", color="red")
+        ax2.tick_params(axis="y", labelcolor="red")
+
+        # Agregar leyenda combinada
+        fig.legend(handles=[line1, line2], loc="upper left", bbox_to_anchor=(0.1, 0.9))
+
+        fig.suptitle("Evolución de la Recompensa y su Varianza Durante el Entrenamiento")
+        fig.tight_layout()
         plt.show()
 
     def plot_wins(self):
-        window = 100000
 
-        avg_wins = pd.Series(self.qlearning.wins_history).rolling(window).mean()
+        avg_wins = pd.Series(self.qlearning.wins_history).rolling(self.window).mean()
 
         plt.figure(figsize=(10,5))
         plt.plot(np.arange(len(avg_wins)), avg_wins, label="Victorias Promedio")

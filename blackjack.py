@@ -4,21 +4,21 @@ class Player():
     def __init__(self):
         self.cards = []
         self.has_ace = False #Indica si hay un As en la mano
-        self.sum = 0 #Suma de las cartas
+        self.total = 0 #Suma de las cartas
 
     def take_card(self, card):
         self.cards.append(card)
         self.has_ace = 1 in self.cards
         
-        self.sum = sum(self.cards)
-        if self.has_ace and self.sum + 10 <= 21: #Chequear si es conveniente usar el As o no
-            self.sum += 10
+        self.total = sum(self.cards)
+        if self.has_ace and self.total + 10 <= 21: #Chequear si es conveniente usar el As o no
+            self.total += 10
 
 
 class Dealer():
     def __init__(self):
         self.cards = []
-        self.sum = 0 #Suma de las cartas
+        self.total = 0 #Suma de las cartas
 
     def take_card(self, card):
         self.cards.append(11 if card == 1 else card)
@@ -46,28 +46,18 @@ class BlackJack():
         self.dealer.take_card(self.deck.pop())
 
     def get_state(self):
-        return {'sum_player': self.player.sum,
+        return {'player_total': self.player.total,
                 'player_state': self.player_state,
                 'dealer': self.dealer.cards[0],
                 'has_ace': 1 if self.player.has_ace else 0,
-                'dealer_sum': self.dealer.sum}
+                'dealer_total': self.dealer.total}
 
-    def calculate_mid_player_state(self): #Calcular estado del jugador si no se plantó
-        if self.player.sum > 21:
-            self.player_state = 'Over 21'
-        #elif self.player.sum == 21:
-        #    self.player_state == 'Exactly 21'
-        #elif 17 <= self.player.sum < 21:
-        #    self.player_state = 'Btw 17-21'
-        #elif 11 < self.player.sum <= 16:
-        #    self.player_state = 'Btw 11-17'
-        #else:
-        #    self.player_state = 'Under 11'
-
-    def calculate_last_player_state(self): #Calcular estado del jugador una vez se plantó
-        if self.dealer.sum > 21:
+    def calculate_player_state(self): #Calcular estado del jugador una vez se plantó
+        if self.player.total > 21:
+            self.player_state = 'Lose'
+        elif self.dealer.sum > 21:
             self.player_state = 'Win'
-        elif self.dealer.sum >= self.player.sum:
+        elif self.dealer.sum >= self.player.total:
             self.player_state = 'Lose'
         else:
             self.player_state = 'Win'
@@ -76,11 +66,11 @@ class BlackJack():
 
         if action == 0: #El jugador pide
             self.deal_card()
-            self.calculate_mid_player_state()
-            if self.player_state == 'Over 21':
+            if self.player.total > 21:
+                self.calculate_player_state()
                 self.done = True
         else:   #El jugador se planta
             while self.dealer.sum <= 16:
                 self.take_card()
             self.done = True
-            self.calculate_last_player_state()
+            self.calculate_player_state()
