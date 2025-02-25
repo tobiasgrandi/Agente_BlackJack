@@ -4,7 +4,7 @@ from plot import Plotter
 import numpy as np
 
 env = BlackJack()
-qlearning = Qlearning(alpha=0.05, gamma=0.85, epsilon=1)
+qlearning = Qlearning(alpha=0.1, gamma=0.85, epsilon=1)
 
 episodes = 10000000
 qlearning.train(env, num_episodes= episodes)
