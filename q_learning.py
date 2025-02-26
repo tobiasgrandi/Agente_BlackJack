@@ -9,14 +9,15 @@ class Qlearning():
         self.alpha = alpha #Tasa de aprendizaje
         self.gamma = gamma #Tasa de descuento
         self.epsilon = epsilon #Tasa de exploración
-        self.reward = {"Lose": -1,
-                        "Win": 1}
+        self.reward = {"Lose": -5,
+                        "Win": 5}
         self.results = {
             'Lose': 0,
             'Win': 0,
         }
         self.rewards_history = []
         self.wins_history = []
+        self.qtable_history = [self.qtable]
 
 
     def select_action(self, state): #Devuelve la acción a tomar por el jugador
@@ -31,18 +32,20 @@ class Qlearning():
         
         
         self.qtable[current_state['player_total']-4, current_state['dealer']-2, current_state['has_ace'], action] = current_q + self.alpha*(reward+self.gamma*max_next_q-current_q)
-
+        self.qtable_history.append(self.qtable)
 
     def reduce_exploration(self):
-        self.epsilon = max(0.1, self.epsilon*0.96)
+        self.epsilon = max(0.1, self.epsilon*0.9)
 
     def get_reward(self, player_state, player_total):
         diff = 21 - player_total
         reward = 0
         if diff >= 0:
-            reward += (-(diff**2)/10)+3 #Si diff >= 6, es negativo
+            #reward += (-(diff**2)/12)+5 #Si diff >= 6, es negativo
+            reward += -(diff/(1.5))+3
         else:
-            reward += (-(diff**2)/5)-1 #Siempre es negativo
+            reward += diff-3
+            #reward += (-(diff**2)/10)-1 #Siempre es negativo
         return reward + self.reward[player_state]
 
 
@@ -81,7 +84,30 @@ class Qlearning():
 
             self.results[next_state['player_state']] += 1
 
-            if episode % 100000 == 0 and episode != 0:
+            if episode % 500000 == 0 and episode != 0:
                 self.reduce_exploration()
+
+            if episode % 100000 == 0:
                 print(episode, self.epsilon)
-                
+
+    def play(self, env, test_games): #Simular partidas con explotación pura
+        self.epsilon = 0 #Explotación pura
+        wins = 0
+        losses = 0
+
+        for _ in range(test_games):    
+            env.reset()
+            done = False
+
+            while not done:
+                state = env.get_state()
+                player_action = self.select_action(state)
+                env.step(player_action)
+                done = env.done
+            
+            if env.get_state()['player_state'] == 'Win':
+                wins += 1
+            else:
+                losses += 1
+
+        return wins, losses

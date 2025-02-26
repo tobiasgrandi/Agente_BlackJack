@@ -3,17 +3,26 @@ import numpy as np
 class Player():
     def __init__(self):
         self.cards = []
-        self.has_ace = False #Indica si hay un As en la mano
+        self.total_usable_aces = 0 #Cantidad de As usables en la mano
+        self.has_ace = bool(self.total_usable_aces) #Indica si hay un As en la mano
         self.total = 0 #Suma de las cartas
 
     def take_card(self, card):
         self.cards.append(card)
-        self.has_ace = 1 in self.cards
-        
+
+        if card == 1:
+            self.total_usable_aces += 1
+            self.has_ace = True
+
         self.total = sum(self.cards)
-        if self.has_ace and self.total + 10 <= 21: #Chequear si es conveniente usar el As o no
+
+        for ace in range(self.total_usable_aces):
             self.total += 10
 
+        while self.has_ace and self.total > 21:
+            self.total_usable_aces -= 1
+            self.total -= 10
+            self.has_ace = bool(self.total_usable_aces)
 
 class Dealer():
     def __init__(self):
