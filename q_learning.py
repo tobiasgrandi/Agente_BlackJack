@@ -9,7 +9,7 @@ class Qlearning():
         self.alpha = alpha #Tasa de aprendizaje
         self.gamma = gamma #Tasa de descuento
         self.epsilon = epsilon #Tasa de exploración
-        self.reward = {"Lose": -7,
+        self.reward = {"Lose": -3,
                         "Win": 5}
         self.results = {
             'Lose': 0,
@@ -42,8 +42,7 @@ class Qlearning():
             #reward += (-(diff**2)/12)+5 #Si diff >= 6, es negativo
             reward += 9/(diff+3)
         else:
-            reward += -3#(-9/(diff-3))-3.5
-            #reward += (-(diff**2)/10)-1 #Siempre es negativo
+            reward += (-9/(diff-3))-8
         return reward + self.reward[player_state]
 
 

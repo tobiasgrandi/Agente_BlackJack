@@ -8,7 +8,7 @@ class Plotter():
 
     def __init__(self, qlearning):
         self.qlearning = qlearning
-        self.window = 100000
+        self.window = 200000
 
 
     def plot_training_metrics(self):
@@ -16,21 +16,20 @@ class Plotter():
         wins_history = pd.Series(self.qlearning.wins_history)
 
         avg_rewards = rewards_history.rolling(self.window).mean()
-        var_rewards = rewards_history.rolling(self.window).var()
+        std_rewards = rewards_history.rolling(self.window).std()
         avg_wins = wins_history.rolling(self.window).mean()
 
         fig, axes = plt.subplots(1, 2, figsize=(15, 5))  # Dos filas, una columna
 
-        # Gráfica de Recompensa y Varianza
         ax1 = axes[0]  
         ax1.set_xlabel("Episodios")
         ax1.set_ylabel("Recompensa Promedio", color="blue")
         line1, = ax1.plot(np.arange(len(avg_rewards)), avg_rewards, label="Recompensa Promedio", color="blue")
         ax1.tick_params(axis="y", labelcolor="blue")
 
-        ax2 = ax1.twinx()  # Segundo eje Y para varianza
-        ax2.set_ylabel("Varianza de la Recompensa", color="red")
-        line2, = ax2.plot(np.arange(len(var_rewards)), var_rewards, label="Varianza de la Recompensa", color="red")
+        ax2 = ax1.twinx() 
+        ax2.set_ylabel("Desviación estándar de la Recompensa", color="red")
+        line2, = ax2.plot(np.arange(len(std_rewards)), std_rewards, label="Desviación estándar de la Recompensa", color="red")
         ax2.tick_params(axis="y", labelcolor="red")
 
         #Gráfica de victorias promedio
@@ -43,7 +42,7 @@ class Plotter():
         axes[0].legend(handles=[line1, line2], loc="upper left", bbox_to_anchor=(0.1, 0.9))
         axes[1].legend(handles=[line3], loc="upper left")
 
-        fig.suptitle("Evolución de la Recompensa, Varianza y Victorias Durante el Entrenamiento")
+        fig.suptitle("Evolución de la Recompensa, D.E y Victorias Durante el Entrenamiento")
         fig.tight_layout()
         plt.show()
 
