@@ -22,7 +22,7 @@ class Player():
         while self.has_ace and self.total > 21:
             self.total_usable_aces -= 1
             self.total -= 10
-            self.has_ace = bool(self.total_usable_aces)
+            self.has_ace = self.total_usable_aces > 0
 
 class Dealer():
     def __init__(self):
