@@ -16,7 +16,6 @@ class Plotter():
         wins_history = pd.Series(self.qlearning.wins_history)
 
         avg_rewards = rewards_history.rolling(self.window).mean()
-        std_rewards = rewards_history.rolling(self.window).std()
         avg_wins = wins_history.rolling(self.window).mean()
 
         fig, axes = plt.subplots(1, 2, figsize=(15, 5))  # Dos filas, una columna
@@ -27,11 +26,6 @@ class Plotter():
         line1, = ax1.plot(np.arange(len(avg_rewards)), avg_rewards, label="Recompensa Promedio", color="blue")
         ax1.tick_params(axis="y", labelcolor="blue")
 
-        ax2 = ax1.twinx() 
-        ax2.set_ylabel("Desviación estándar de la Recompensa", color="red")
-        line2, = ax2.plot(np.arange(len(std_rewards)), std_rewards, label="Desviación estándar de la Recompensa", color="red")
-        ax2.tick_params(axis="y", labelcolor="red")
-
         #Gráfica de victorias promedio
         ax3 = axes[1]  
         line3, = ax3.plot(np.arange(len(avg_wins)), avg_wins, label="Victorias Promedio", color="green")
@@ -39,10 +33,10 @@ class Plotter():
         ax3.set_ylabel("Victorias Promedio")
 
 
-        axes[0].legend(handles=[line1, line2], loc="upper left", bbox_to_anchor=(0.1, 0.9))
+        axes[0].legend(handles=[line1], loc="upper left", bbox_to_anchor=(0.1, 0.9))
         axes[1].legend(handles=[line3], loc="upper left")
 
-        fig.suptitle("Evolución de la Recompensa, D.E y Victorias Durante el Entrenamiento")
+        fig.suptitle("Evolución de la Recompensa y Victorias Durante el Entrenamiento")
         fig.tight_layout()
         plt.show()
 

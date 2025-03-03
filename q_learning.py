@@ -39,7 +39,6 @@ class Qlearning():
         diff = 21 - player_total
         reward = 0
         if diff >= 0:
-            #reward += (-(diff**2)/12)+5 #Si diff >= 6, es negativo
             reward += 9/(diff+3)
         else:
             reward += (-9/(diff-3))-8
