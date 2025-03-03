@@ -8,9 +8,9 @@ Este proyecto consiste en un agente inteligente que ha aprendido a jugar al Blac
 
 El agente toma decisiones en función de dos políticas distintas:
 
-- Manos duras: Cuando el jugador no tiene un As usable.
+- **Manos duras:** Cuando el jugador no tiene un As usable.
 
-- Manos blandas: Cuando el jugador tiene al menos un As usable.
+- **Manos blandas:** Cuando el jugador tiene al menos un As usable.
 
 Cada política se representa en forma de tablas de doble entrada, donde:
 
@@ -30,9 +30,9 @@ El entrenamiento del agente se llevó a cabo en 20 millones de partidas, utiliza
 
 Para verificar que el agente ha aprendido correctamente, se generaron las siguientes visualizaciones:
 
-- Gráfica de convergencia de la recompensa: Muestra cómo el agente mejora sus decisiones con el tiempo.
+- **Gráfica de convergencia de la recompensa:** Muestra cómo el agente mejora sus decisiones con el tiempo.
 
-- Gráfica de convergencia de la cantidad de victorias: Indica el progreso del agente en términos de partidas ganadas.
+- **Gráfica de convergencia de la cantidad de victorias:** Indica el progreso del agente en términos de partidas ganadas.
 
 A continuación, se incluyen las imágenes de convergencia y las tablas que representan las políticas:
 
@@ -44,11 +44,11 @@ A continuación, se incluyen las imágenes de convergencia y las tablas que repr
 
 Tras completar el entrenamiento, se realizaron 100,000 partidas con explotación pura, obteniendo un porcentaje de victorias del 44%.
 
-- Es importante notar que la política de decisión aprendida por el agente no es la óptima, aunque sí es muy buena. Esto puede deberse a varios factores, como:
+Es importante notar que la política de decisión aprendida por el agente no es la óptima, aunque sí es muy buena. Esto puede deberse a varios factores, como:
 
-- Diseño de la función de recompensa: La recompensa no solo premia ganar, sino también estar cerca de 21. Esto puede haber llevado al agente a priorizar estrategias demasiado conservadoras.
+- **Diseño de la función de recompensa:** La recompensa no solo premia ganar, sino también estar cerca de 21. Esto puede haber llevado al agente a priorizar estrategias demasiado conservadoras.
 
-- Número finito de partidas: Aunque 20 millones de partidas es una cantidad grande, el espacio de estados y acciones en Blackjack sigue siendo extenso, lo que puede hacer que algunas situaciones no se hayan explorado lo suficiente.
+- **Número finito de partidas:** Aunque 20 millones de partidas es una cantidad grande, el espacio de estados y acciones en Blackjack sigue siendo extenso, lo que puede hacer que algunas situaciones no se hayan explorado lo suficiente.
 
 ## Instalación y Uso
 
